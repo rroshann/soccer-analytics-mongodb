@@ -583,7 +583,7 @@ The dataset is from Kaggle and is subject to its own license terms.
 
 ## 🙏 Acknowledgments
 
-- **Professor:** Professor Dana Zhang for project guidance
+- **Professor:** Professor Peng Zhang for project guidance
 - **Kaggle:** For providing the European Soccer Database
 - **MongoDB:** For excellent NoSQL database technology
 - **Scikit-learn:** For robust machine learning tools
