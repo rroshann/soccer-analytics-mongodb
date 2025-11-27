@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Soccer Analytics{% endblock %}
+
+{% block content %}
+<h2>Welcome to Soccer Analytics Platform</h2>
+
+<p style="font-size: 18px; color: #555; margin-bottom: 30px;">
+    Explore European soccer data from 2008-2016 with MongoDB queries and ML predictions!
+</p>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px;">
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; text-align: center;">
+        <h3 style="font-size: 40px; margin-bottom: 10px;">{{ stats.total_matches }}</h3>
+        <p style="font-size: 18px;">Matches</p>
+    </div>
+    
+    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 30px; border-radius: 10px; text-align: center;">
+        <h3 style="font-size: 40px; margin-bottom: 10px;">{{ stats.total_players }}</h3>
+        <p style="font-size: 18px;">Players</p>
+    </div>
+    
+    <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 30px; border-radius: 10px; text-align: center;">
+        <h3 style="font-size: 40px; margin-bottom: 10px;">{{ stats.total_teams }}</h3>
+        <p style="font-size: 18px;">Teams</p>
+    </div>
+    
+    <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 30px; border-radius: 10px; text-align: center;">
+        <h3 style="font-size: 40px; margin-bottom: 10px;">{{ stats.total_leagues }}</h3>
+        <p style="font-size: 18px;">Leagues</p>
+    </div>
+</div>
+
+<div style="background: #f8f9fa; padding: 30px; border-radius: 10px; margin-bottom: 30px;">
+    <h3 style="color: #2c3e50; margin-bottom: 15px;">Features</h3>
+    <ul style="list-style: none; font-size: 16px; line-height: 2;">
+        <li>✅ 7 MongoDB queries demonstrating different query types</li>
+        <li>✅ Machine Learning match outcome prediction (50% accuracy)</li>
+        <li>✅ 25,000+ matches from 11 European leagues</li>
+        <li>✅ Player and team attributes from FIFA ratings</li>
+        <li>✅ Interactive web interface for data exploration</li>
+    </ul>
+</div>
+
+<div style="text-align: center;">
+    <a href="/predict" class="btn" style="display: inline-block; text-decoration: none; margin-right: 10px;">
+        Try Match Predictor
+    </a>
+    <a href="/queries" class="btn" style="display: inline-block; text-decoration: none; background: #764ba2;">
+        Explore Data
+    </a>
+</div>
+
+<div style="margin-top: 40px; padding: 20px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 5px;">
+    <p style="color: #856404; margin: 0;">
+        <strong>Note:</strong> This project demonstrates NoSQL database design with MongoDB, 
+        complex aggregation queries, and machine learning integration for a real-world soccer analytics use case.
+    </p>
+</div>
+{% endblock %}

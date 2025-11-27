@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}Query 4: Player Appearance Frequency{% endblock %}
+
+{% block extra_css %}
+<style>
+    .query-form {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+    
+    .results-table {
+        margin-top: 30px;
+        overflow-x: auto;
+    }
+    
+    table {
+        width: 100%;
+        font-size: 14px;
+    }
+    
+    .loading {
+        text-align: center;
+        padding: 40px;
+        display: none;
+    }
+    
+    .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .iron-man {
+        background: #fff3cd;
+    }
+    
+    .medal {
+        font-size: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2>👤 Query 4: Player Appearance Frequency</h2>
+<p style="color: #666; margin-bottom: 30px;">
+    Find the most consistent players by counting appearances in a league/season.
+</p>
+
+<div class="query-form">
+    <form id="queryForm">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div>
+                <label for="league" style="display: block; margin-bottom: 8px; font-weight: bold;">Select League:</label>
+                <select id="league" name="league" required>
+                    <option value="">-- Choose a League --</option>
+                    {% for league in leagues %}
+                    <option value="{{ league }}">{{ league }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div>
+                <label for="season" style="display: block; margin-bottom: 8px; font-weight: bold;">Select Season:</label>
+                <select id="season" name="season" required>
+                    <option value="">-- Choose a Season --</option>
+                    {% for season in seasons %}
+                    <option value="{{ season }}">{{ season }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div>
+                <label for="limit" style="display: block; margin-bottom: 8px; font-weight: bold;">Top Players:</label>
+                <select id="limit" name="limit">
+                    <option value="10">Top 10</option>
+                    <option value="15" selected>Top 15</option>
+                    <option value="20">Top 20</option>
+                    <option value="30">Top 30</option>
+                </select>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn">Find Most Consistent Players</button>
+    </form>
+</div>
+
+<div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>Counting player appearances...</p>
+</div>
+
+<div id="results" style="display: none;">
+    <h3 style="margin-bottom: 20px;" id="resultsTitle"></h3>
+    
+    <div class="results-table">
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Player</th>
+                    <th>Team(s)</th>
+                    <th>Appearances</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </div>
+    
+    <div style="margin-top: 20px; padding: 20px; background: #e7f3ff; border-radius: 10px;">
+        <h4 style="margin-bottom: 10px;">Key Findings:</h4>
+        <p id="summary"></p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('queryForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const league = document.getElementById('league').value;
+    const season = document.getElementById('season').value;
+    const limit = document.getElementById('limit').value;
+    
+    // Show loading
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+    
+    try {
+        const response = await fetch('/api/query4', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ league, season, limit: parseInt(limit) })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Update title
+            document.getElementById('resultsTitle').textContent = 
+                `${league} - ${season} Most Consistent Players`;
+            
+            // Build table
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            data.players.forEach((player, index) => {
+                const row = tbody.insertRow();
+                
+                // Highlight iron men (played all matches)
+                if (player.appearances === data.total_matches) {
+                    row.className = 'iron-man';
+                }
+                
+                let medal = '';
+                if (index === 0) medal = '<span class="medal">🥇</span>';
+                else if (index === 1) medal = '<span class="medal">🥈</span>';
+                else if (index === 2) medal = '<span class="medal">🥉</span>';
+                
+                row.innerHTML = `
+                    <td><strong>${index + 1}</strong> ${medal}</td>
+                    <td><strong>${player.player}</strong></td>
+                    <td>${player.teams}</td>
+                    <td><strong>${player.appearances}</strong> ${player.appearances === data.total_matches ? '⭐ (All matches)' : ''}</td>
+                `;
+            });
+            
+            // Summary
+            const ironMen = data.players.filter(p => p.appearances === data.total_matches).length;
+            const topPlayer = data.players[0];
+            
+            document.getElementById('summary').innerHTML = `
+                <strong>Most Appearances:</strong> ${topPlayer.player} with ${topPlayer.appearances} games<br>
+                <strong>Iron Men (played all ${data.total_matches} matches):</strong> ${ironMen} player${ironMen !== 1 ? 's' : ''}<br>
+                <strong>Players with 30+ appearances:</strong> ${data.regulars_count}
+            `;
+            
+            // Show results
+            document.getElementById('results').style.display = 'block';
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        alert('Failed to load data');
+        console.error(error);
+    } finally {
+        document.getElementById('loading').style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

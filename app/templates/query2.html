@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Query 2: Home vs Away Performance{% endblock %}
+
+{% block extra_css %}
+<style>
+    .query-form {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+    
+    .results-table {
+        margin-top: 30px;
+        overflow-x: auto;
+    }
+    
+    table {
+        width: 100%;
+        font-size: 14px;
+    }
+    
+    .loading {
+        text-align: center;
+        padding: 40px;
+        display: none;
+    }
+    
+    .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .positive {
+        color: green;
+        font-weight: bold;
+    }
+    
+    .negative {
+        color: red;
+        font-weight: bold;
+    }
+    
+    .neutral {
+        color: #666;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2>🏠 Query 2: Home vs Away Performance Analysis</h2>
+<p style="color: #666; margin-bottom: 30px;">
+    Compare how teams perform at home versus away to identify home advantage patterns.
+</p>
+
+<div class="query-form">
+    <form id="queryForm">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div>
+                <label for="league" style="display: block; margin-bottom: 8px; font-weight: bold;">Select League:</label>
+                <select id="league" name="league" required>
+                    <option value="">-- Choose a League --</option>
+                    {% for league in leagues %}
+                    <option value="{{ league }}">{{ league }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div>
+                <label for="season" style="display: block; margin-bottom: 8px; font-weight: bold;">Select Season:</label>
+                <select id="season" name="season" required>
+                    <option value="">-- Choose a Season --</option>
+                    {% for season in seasons %}
+                    <option value="{{ season }}">{{ season }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn">Run Query</button>
+    </form>
+</div>
+
+<div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>Analyzing home and away performance...</p>
+</div>
+
+<div id="results" style="display: none;">
+    <h3 style="margin-bottom: 20px;" id="resultsTitle"></h3>
+    
+    <div class="results-table">
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <th>Team</th>
+                    <th>Home Win %</th>
+                    <th>Away Win %</th>
+                    <th>Home Advantage</th>
+                    <th>Home Pts</th>
+                    <th>Away Pts</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </div>
+    
+    <div style="margin-top: 20px; padding: 20px; background: #e7f3ff; border-radius: 10px;">
+        <h4 style="margin-bottom: 10px;">Key Findings:</h4>
+        <p id="summary"></p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('queryForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const league = document.getElementById('league').value;
+    const season = document.getElementById('season').value;
+    
+    // Show loading
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+    
+    try {
+        const response = await fetch('/api/query2', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ league, season })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Update title
+            document.getElementById('resultsTitle').textContent = 
+                `${league} - ${season} Home vs Away Analysis`;
+            
+            // Build table
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            data.results.forEach((team) => {
+                const row = tbody.insertRow();
+                
+                const advantageClass = team.home_advantage > 10 ? 'positive' : 
+                                      team.home_advantage < 0 ? 'negative' : 'neutral';
+                
+                row.innerHTML = `
+                    <td><strong>${team.team}</strong></td>
+                    <td>${team.home_win_pct}%</td>
+                    <td>${team.away_win_pct}%</td>
+                    <td class="${advantageClass}">${team.home_advantage >= 0 ? '+' : ''}${team.home_advantage}%</td>
+                    <td>${team.home_points}</td>
+                    <td>${team.away_points}</td>
+                `;
+            });
+            
+            // Summary
+            document.getElementById('summary').innerHTML = `
+                <strong>Biggest Home Advantage:</strong> ${data.best_home.team} (+${data.best_home.home_advantage}%)<br>
+                <strong>Best Away Team:</strong> ${data.worst_home.team} (${data.worst_home.home_advantage >= 0 ? '+' : ''}${data.worst_home.home_advantage}%)<br>
+                <strong>League Average Home Advantage:</strong> +${data.avg_advantage}%
+            `;
+            
+            // Show results
+            document.getElementById('results').style.display = 'block';
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        alert('Failed to load data');
+        console.error(error);
+    } finally {
+        document.getElementById('loading').style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

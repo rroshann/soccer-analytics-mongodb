@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+
+{% block title %}Query 6: Scoring Analysis{% endblock %}
+
+{% block extra_css %}
+<style>
+    .query-form {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+    
+    .category-section {
+        margin-bottom: 40px;
+    }
+    
+    .category-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px 10px 0 0;
+        font-size: 20px;
+        font-weight: bold;
+    }
+    
+    .attack-header {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .defense-header {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .results-table {
+        overflow-x: auto;
+    }
+    
+    table {
+        width: 100%;
+        font-size: 14px;
+        border: 2px solid #ddd;
+        border-top: none;
+    }
+    
+    .loading {
+        text-align: center;
+        padding: 40px;
+        display: none;
+    }
+    
+    .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .top-team {
+        background: #fff3cd;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2>⚽ Query 6: High-Scoring and Low-Scoring Teams Analysis</h2>
+<p style="color: #666; margin-bottom: 30px;">
+    Classify teams as offensive or defensive based on goals scored and conceded per game.
+</p>
+
+<div class="query-form">
+    <form id="queryForm">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div>
+                <label for="league" style="display: block; margin-bottom: 8px; font-weight: bold;">Select League:</label>
+                <select id="league" name="league" required>
+                    <option value="">-- Choose a League --</option>
+                    {% for league in leagues %}
+                    <option value="{{ league }}">{{ league }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div>
+                <label for="season" style="display: block; margin-bottom: 8px; font-weight: bold;">Select Season:</label>
+                <select id="season" name="season" required>
+                    <option value="">-- Choose a Season --</option>
+                    {% for season in seasons %}
+                    <option value="{{ season }}">{{ season }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn">Analyze Scoring Patterns</button>
+    </form>
+</div>
+
+<div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>Analyzing offensive and defensive capabilities...</p>
+</div>
+
+<div id="results" style="display: none;">
+    <h3 style="margin-bottom: 30px; text-align: center;" id="resultsTitle"></h3>
+    
+    <!-- Best Attack Section -->
+    <div class="category-section">
+        <div class="category-header">
+            🔥 Most Offensive Teams (Goals Scored Per Game)
+        </div>
+        <div class="results-table">
+            <table id="attackTable">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Team</th>
+                        <th>Matches</th>
+                        <th>Total Goals</th>
+                        <th>Avg/Game</th>
+                    </tr>
+                </thead>
+                <tbody id="attackBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Best Defense Section -->
+    <div class="category-section">
+        <div class="category-header defense-header">
+            🛡️ Best Defensive Teams (Goals Conceded Per Game)
+        </div>
+        <div class="results-table">
+            <table id="defenseTable">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Team</th>
+                        <th>Matches</th>
+                        <th>Total Conceded</th>
+                        <th>Avg/Game</th>
+                    </tr>
+                </thead>
+                <tbody id="defenseBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Worst Defense Section -->
+    <div class="category-section">
+        <div class="category-header attack-header">
+            ⚠️ Worst Defensive Teams (Most Goals Conceded)
+        </div>
+        <div class="results-table">
+            <table id="worstDefenseTable">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Team</th>
+                        <th>Matches</th>
+                        <th>Total Conceded</th>
+                        <th>Avg/Game</th>
+                    </tr>
+                </thead>
+                <tbody id="worstDefenseBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div style="margin-top: 30px; padding: 20px; background: #e7f3ff; border-radius: 10px;">
+        <h4 style="margin-bottom: 10px;">Summary:</h4>
+        <p id="summary"></p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('queryForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const league = document.getElementById('league').value;
+    const season = document.getElementById('season').value;
+    
+    // Show loading
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+    
+    try {
+        const response = await fetch('/api/query6', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ league, season })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Update title
+            document.getElementById('resultsTitle').textContent = 
+                `${league} - ${season} Scoring Analysis`;
+            
+            // Build attack table (top 10)
+            const attackBody = document.getElementById('attackBody');
+            attackBody.innerHTML = '';
+            
+            data.best_attack.slice(0, 10).forEach((team, index) => {
+                const row = attackBody.insertRow();
+                if (index === 0) row.className = 'top-team';
+                
+                row.innerHTML = `
+                    <td><strong>${index + 1}</strong></td>
+                    <td><strong>${team.team}</strong></td>
+                    <td>${team.matches}</td>
+                    <td>${team.goals_scored}</td>
+                    <td><strong>${team.avg_scored}</strong></td>
+                `;
+            });
+            
+            // Build defense table (top 10)
+            const defenseBody = document.getElementById('defenseBody');
+            defenseBody.innerHTML = '';
+            
+            data.best_defense.slice(0, 10).forEach((team, index) => {
+                const row = defenseBody.insertRow();
+                if (index === 0) row.className = 'top-team';
+                
+                row.innerHTML = `
+                    <td><strong>${index + 1}</strong></td>
+                    <td><strong>${team.team}</strong></td>
+                    <td>${team.matches}</td>
+                    <td>${team.goals_conceded}</td>
+                    <td><strong>${team.avg_conceded}</strong></td>
+                `;
+            });
+            
+            // Build worst defense table (top 5)
+            const worstDefenseBody = document.getElementById('worstDefenseBody');
+            worstDefenseBody.innerHTML = '';
+            
+            data.worst_defense.slice(0, 5).forEach((team, index) => {
+                const row = worstDefenseBody.insertRow();
+                
+                row.innerHTML = `
+                    <td><strong>${index + 1}</strong></td>
+                    <td><strong>${team.team}</strong></td>
+                    <td>${team.matches}</td>
+                    <td>${team.goals_conceded}</td>
+                    <td><strong>${team.avg_conceded}</strong></td>
+                `;
+            });
+            
+            // Summary
+            document.getElementById('summary').innerHTML = `
+                <strong>Best Attack:</strong> ${data.summary.best_attack.team} (${data.summary.best_attack.avg_scored} goals/game)<br>
+                <strong>Best Defense:</strong> ${data.summary.best_defense.team} (${data.summary.best_defense.avg_conceded} goals conceded/game)<br>
+                <strong>Worst Defense:</strong> ${data.summary.worst_defense.team} (${data.summary.worst_defense.avg_conceded} goals conceded/game)
+            `;
+            
+            // Show results
+            document.getElementById('results').style.display = 'block';
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        alert('Failed to load data');
+        console.error(error);
+    } finally {
+        document.getElementById('loading').style.display = 'none';
+    }
+});
+</script>
+{% endblock %}
