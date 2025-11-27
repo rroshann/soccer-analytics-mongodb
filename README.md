@@ -8,7 +8,7 @@ A comprehensive soccer analytics platform built with MongoDB, Flask, and Machine
 
 ---
 
-## 🎯 Project Overview
+## Project Overview
 
 This project demonstrates mastery of NoSQL databases by building a full-stack soccer analytics application with:
 - **MongoDB** for flexible data storage and complex queries
@@ -20,7 +20,7 @@ This project demonstrates mastery of NoSQL databases by building a full-stack so
 
 ---
 
-## 🏆 Key Features
+## Key Features
 
 ### 1. Interactive Query System
 - **Query 1:** Team Performance by Season (league standings)
@@ -45,7 +45,7 @@ This project demonstrates mastery of NoSQL databases by building a full-stack so
 
 ---
 
-## 📊 Dataset
+## Dataset
 
 **Source:** [Kaggle - European Soccer Database](https://www.kaggle.com/datasets/hugomathien/soccer)
 
@@ -57,7 +57,7 @@ This project demonstrates mastery of NoSQL databases by building a full-stack so
 
 ---
 
-## 🛠️ Technologies Used
+## Technologies Used
 
 - **Database:** MongoDB 7.x (Docker)
 - **Backend:** Python 3.8+, Flask
@@ -67,7 +67,7 @@ This project demonstrates mastery of NoSQL databases by building a full-stack so
 
 ---
 
-## 🚀 Setup Instructions
+## Setup Instructions
 
 ### Prerequisites
 ```bash
@@ -133,7 +133,7 @@ Open browser: `http://localhost:5001`
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 soccer-analytics-mongodb/
@@ -173,7 +173,7 @@ soccer-analytics-mongodb/
 
 ---
 
-## 🎮 Usage Examples
+## Usage Examples
 
 ### Running Individual Queries (Command Line)
 ```bash
@@ -196,7 +196,7 @@ python scripts/queries/query5_team_form.py
 
 ---
 
-## 📈 Query Demonstrations
+## Query Demonstrations
 
 ### Query 1: Team Performance by Season
 **Example Result:** Leicester City won 2015/2016 with 81 points (23W-12D-3L)
@@ -263,7 +263,7 @@ python scripts/queries/query5_team_form.py
 
 ---
 
-## 🤖 Machine Learning Model
+## Machine Learning Model
 
 ### Model Details
 - **Algorithm:** Gradient Boosting Classifier (best of 3 tested)
@@ -298,7 +298,7 @@ Soccer is inherently unpredictable:
 
 ---
 
-## 🔍 MongoDB Design Decisions
+## MongoDB Design Decisions
 
 ### Why MongoDB?
 1. **Flexible Schema:** Match events vary (different numbers of goals, cards, substitutions per match)
@@ -384,7 +384,7 @@ db.teams.createIndex({ "team_api_id": 1 })
 
 ---
 
-## 🎓 Learning Outcomes
+## Learning Outcomes
 
 This project demonstrates:
 
@@ -423,7 +423,7 @@ This project demonstrates:
 
 ---
 
-## 📊 Project Metrics
+## Project Metrics
 
 - **Total Lines of Code:** ~3,000+
 - **Development Time:** ~20 hours
@@ -434,7 +434,7 @@ This project demonstrates:
 
 ---
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### MongoDB Connection Error
 ```bash
@@ -467,7 +467,7 @@ ls -la data/model/
 
 ---
 
-## 🚨 Known Limitations
+## Known Limitations
 
 ### Dataset Limitations
 1. **Individual Goal Scorers Not Tracked:** Dataset doesn't specify which player scored which goal
@@ -489,7 +489,7 @@ ls -la data/model/
 
 ---
 
-## 🔮 Future Enhancements
+## Future Enhancements
 
 ### Potential Improvements
 1. **Real-Time Data:** Integrate with live match APIs for current season data
@@ -511,7 +511,7 @@ ls -la data/model/
 
 ---
 
-## 📚 References
+## References
 
 ### Dataset
 - [Kaggle - European Soccer Database](https://www.kaggle.com/datasets/hugomathien/soccer)
@@ -528,44 +528,7 @@ ls -la data/model/
 
 ---
 
-## 📝 Submission Checklist
-
-For DS5760 Final Project:
-
-- [x] Proposal (1-2 pages) submitted
-- [x] MongoDB database designed and implemented
-- [x] Dataset curated (25,979 matches)
-- [x] 7 distinct queries implemented (Python + Web)
-- [x] Extension component 1: Flask Web UI
-- [x] Extension component 2: Machine Learning model
-- [x] GitHub repository with code
-- [x] README documentation
-- [x] Query screenshots captured
-- [ ] Final presentation prepared
-- [ ] Demo rehearsed
-
----
-
-## 🎬 Demo Script
-
-### Quick Demo (5 minutes)
-1. **Intro (30 sec):** "Built soccer analytics platform with MongoDB, analyzed 25k matches"
-2. **Database (1 min):** Show MongoDB collections, explain denormalization
-3. **Query Demo (2 min):** 
-   - Query 1: Leicester City championship season
-   - Query 5: Team form analysis showing momentum
-4. **ML Prediction (1 min):** Live prediction of Man United vs Liverpool
-5. **Conclusion (30 sec):** "Demonstrates NoSQL design, complex queries, ML integration"
-
-### Full Demo (10 minutes)
-- Add Query 3 (Head-to-Head) and Query 7 (Attributes Correlation)
-- Show code snippets for one query
-- Discuss model performance and why 50% is realistic
-- Take questions
-
----
-
-## 👨‍💻 Author
+## Author
 
 **Roshan Sivakumar**  
 - GitHub: [@rroshann](https://github.com/rroshann)
@@ -573,7 +536,7 @@ For DS5760 Final Project:
 
 ---
 
-## 📄 License
+## License
 
 This project was created for academic purposes as part of DS5760 coursework.
 
@@ -581,7 +544,7 @@ The dataset is from Kaggle and is subject to its own license terms.
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Professor:** DS5760 course instructor for project guidance
 - **Kaggle:** For providing the European Soccer Database
@@ -593,4 +556,3 @@ The dataset is from Kaggle and is subject to its own license terms.
 
 **Last Updated:** November 26, 2024
 
-**Project Status:** ✅ Complete and Deployed
