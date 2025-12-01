@@ -434,39 +434,6 @@ This project demonstrates:
 
 ---
 
-## Troubleshooting
-
-### MongoDB Connection Error
-```bash
-# Check if MongoDB is running
-docker ps
-
-# Restart MongoDB
-docker-compose restart
-
-# Check logs
-docker logs github-mongodb-1
-```
-
-### Port 5000 Already in Use
-Solution: Flask is configured to use port 5001 to avoid conflicts with macOS AirPlay Receiver.
-
-### Model File Not Found
-```bash
-# Re-train the model
-python scripts/train_ml_model_improved.py
-
-# Verify file exists
-ls -la data/model/
-```
-
-### Slow Queries
-- Ensure indexes are created (happens automatically during data conversion)
-- Check MongoDB logs: `docker logs github-mongodb-1`
-- Use `.explain()` in MongoDB shell to analyze query performance
-
----
-
 ## Known Limitations
 
 ### Dataset Limitations
