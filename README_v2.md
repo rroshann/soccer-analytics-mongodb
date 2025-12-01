@@ -83,6 +83,52 @@
 
 ---
 
+## Setup Instructions
+
+### Prerequisites
+- Python 3.8+
+- Docker Desktop
+- MongoDB (via Docker)
+
+### Steps
+
+1. **Install Python Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Download Dataset**
+   - Download `database.sqlite` from Kaggle European Soccer Database
+   - Place it in the project root directory
+
+3. **Start MongoDB (Docker)**
+   ```bash
+   docker compose up
+   ```
+
+4. **Convert Data to MongoDB**
+   ```bash
+   python scripts/convert_sqlite_to_mongo.py
+   ```
+   - Creates 4 collections: matches, players, teams, leagues
+   - Imports 25,979 matches
+   - Creates indexes for performance
+
+5. **Train ML Model**
+   ```bash
+   python scripts/train_ml_model_improved.py
+   ```
+   - Trains Gradient Boosting model
+   - Saves model to `data/model/rf_model.pkl`
+
+6. **Run Flask Application**
+   ```bash
+   python app/app.py
+   ```
+   - Open browser: `http://localhost:5001`
+
+---
+
 ## Live Demo
 
 I'm going to demonstrate the working application now.
