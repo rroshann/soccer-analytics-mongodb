@@ -158,6 +158,38 @@ I'm going to demonstrate the working application now.
 
 ---
 
+## Known Limitations
+
+### Dataset Limitations
+- Individual goal scorers not tracked in dataset
+- Match events stored as XML strings (not parsed)
+- Some early matches missing player lineup data
+- Historical data only (ends in 2016)
+
+### Model Limitations
+- Cannot predict draws well (only 2.8% recall)
+- No live updates - model trained on historical data
+- Simplified features - doesn't account for injuries, weather, referee bias
+- Form calculation uses last 5 games assumption
+
+### Application Limitations
+- No user authentication
+- No caching - each query hits database directly
+- Limited error handling for edge cases
+- No data validation on user inputs
+
+---
+
+## Future Enhancements
+
+### Potential Improvements
+- Real-time data integration with live match APIs
+- User accounts with favorite teams and custom dashboards
+- Player-level predictions
+- Betting odds analysis
+- Mobile app development
+---
+
 ## Conclusion
 
 **Key Takeaways:**
